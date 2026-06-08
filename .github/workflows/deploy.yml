@@ -1,44 +1,59 @@
-name: CI-CD
+name: CI-CD Pipeline
 
 on:
   push:
     branches:
       - main
 
+env:
+  AWS_REGION: eu-north-1
+  ECR_REPOSITORY: devops-final-project
+
 jobs:
   deploy:
-
     runs-on: ubuntu-latest
 
     steps:
 
-    - uses: actions/checkout@v4
+    # 1. Checkout Code
+    - name: Checkout Repository
+      uses: actions/checkout@v4
 
-    - name: Configure AWS
+    # 2. Setup Docker Buildx
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    # 3. Configure AWS Credentials
+    - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ AKIAVBIIKEHAKWSZMZWY }}
-        aws-secret-access-key: ${{ AWS_/6SgXr7scXieRfvwVyEfrbVQC84io8s47nnOlKLJ }}
-        aws-region: eu-north-1
+        aws-secret-access-key: ${{ /6SgXr7scXieRfvwVyEfrbVQC84io8s47nnOlKLJ }}
+        aws-region: ${{ eu-north-1 }}
 
-    - name: Login ECR
+    # 4. Login to Amazon ECR
+    - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
 
-    - name: Build Image
+    # 5. Build Docker Image
+    - name: Build Docker Image
       run: |
-        docker build -t devops-final-project .
+        docker build -t $ECR_REPOSITORY .
 
+    # 6. Tag and Push Image to ECR
     - name: Tag Image
       run: |
-        docker tag devops-final-project:latest \
-        ${{ 346299179456.dkr.ecr.eu-north-1.amazonaws.com/devops-final-project }}:latest
+        docker tag $ECR_REPOSITORY:latest \
+        ${{ 346299179456.dkr.ecr.eu-north-1.amazonaws.com }}/$ECR_REPOSITORY:latest
 
     - name: Push Image
       run: |
-        docker push ${{ 346299179456.dkr.ecr.eu-north-1.amazonaws.com/devops-final-project }}:latest
+        docker push \
+        ${{ 346299179456.dkr.ecr.eu-north-1.amazonaws.com }}/$ECR_REPOSITORY:latest
 
-    - name: SSH Deploy
+    # 7,8,9 SSH into EC2, Pull Image and Restart Kubernetes
+    - name: Deploy on EC2
       uses: appleboy/ssh-action@master
       with:
         host: ${{ 16.16.124.2 }}
@@ -70,10 +85,18 @@ OlEmJq8N/wv6OcdWit7gbyMkPLURw1Nn7h20/Dra/Sj7FoviTjo/oWqgDwXAYOkT
 1fy8G50tJyexAgsq1TXk4jgWmRdCBbYerhWSHbxn5pEdFvmPOrVTQlsuW1gtUZVa
 jbYQflsxRhR+ikeaiW77W9m8U1/aflnbFl2aPtYc2kKAzEO0zDathA==
 -----END RSA PRIVATE KEY----- }}
-
         script: |
-          aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin ${{ 346299179456.dkr.ecr.eu-north-1.amazonaws.com }}
 
-          docker pull ${{ 346299179456.dkr.ecr.eu-north-1.amazonaws.com/devops-final-project }}:latest
+          aws ecr get-login-password --region eu-north-1 | \
+          docker login --username AWS --password-stdin \
+          ${{ 346299179456.dkr.ecr.eu-north-1.amazonaws.com }}
+
+          docker pull \
+          ${{ 346299179456.dkr.ecr.eu-north-1.amazonaws.com }}/devops-final-project:latest
+
+          kubectl set image deployment/devops-final-project \
+          app=${{ 346299179456.dkr.ecr.eu-north-1.amazonaws.com }}/devops-final-project:latest
 
           kubectl rollout restart deployment/devops-final-project
+
+          kubectl rollout status deployment/devops-final-project

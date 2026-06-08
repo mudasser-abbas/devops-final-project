@@ -27,8 +27,8 @@ jobs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-access-key-id: ${{ AKIAVBIIKEHAKWSZMZWY }}
-        aws-secret-access-key: ${{ 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 }}
+        aws-access-key-id: ${{ secrets.EC2_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.SECRET_KEY }}
         aws-region: ${{ eu-north-1 }}
 
     # 4. Login to Amazon ECR
@@ -45,31 +45,31 @@ jobs:
     - name: Tag Image
       run: |
         docker tag $ECR_REPOSITORY:latest \
-        ${{ 346299179456.dkr.ecr.eu-north-1.amazonaws.com }}/$ECR_REPOSITORY:latest
+        ${{ secrets.ECR_REGISTORY }}/$ECR_REPOSITORY:latest
 
     - name: Push Image
       run: |
         docker push \
-        ${{ 346299179456.dkr.ecr.eu-north-1.amazonaws.com }}/$ECR_REPOSITORY:latest
+        ${{ secrets.ECR_REGISTORY }}/$ECR_REPOSITORY:latest
 
     # 7,8,9 SSH into EC2, Pull Image and Restart Kubernetes
     - name: Deploy on EC2
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ 16.16.124.2 }}
+        host: ${{ secrets.EC2_HOST }}
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
 
           aws ecr get-login-password --region eu-north-1 | \
           docker login --username AWS --password-stdin \
-          ${{ 346299179456.dkr.ecr.eu-north-1.amazonaws.com }}
+          ${{ secrets.ECR_REGISTORY }}
 
           docker pull \
-          ${{ 346299179456.dkr.ecr.eu-north-1.amazonaws.com }}/devops-final-project:latest
+          ${{ secrets.ECR_REGISTORY }}/devops-final-project:latest
 
           kubectl set image deployment/devops-final-project \
-          app=${{ 346299179456.dkr.ecr.eu-north-1.amazonaws.com }}/devops-final-project:latest
+          app=${{ secrets.ECR_REGISTORY }}/devops-final-project:latest
 
           kubectl rollout restart deployment/devops-final-project
 

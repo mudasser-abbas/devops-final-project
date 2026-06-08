@@ -58,33 +58,7 @@ jobs:
       with:
         host: ${{ 16.16.124.2 }}
         username: ubuntu
-        key: ${{ -----BEGIN RSA PRIVATE KEY-----
-MIIEpAIBAAKCAQEAp4o/u0PO/02Yso+vAGp99opVdkA0jkjnlcot0dBrCC1QLlXZ
-rp7XVj8fQiTEDVZok9uML+8368Sd7TroAhyrgmVUMzsY4uh740O+u47BVA6RlgBW
-uEzypbqaTKbKz6MEs+j5lAQQufe5Y1aX0h8RiHA+lrggOiim+iyw/GQ1djvufboW
-nh4vGRWSKzv7N6szEXtYeQpfcuO5O1u1THsnK4NXwgpzmNY6+g5v2dtRk+zHk7lN
-O5kRPnO/2eYtGno5k03YHWBEvrIymnPnr23QOW/wJkxY+RsRfViwTTXfSAft344a
-RuNLcZvSmPL9KoR3qbAJzAy63vgSRX2/3Ge7+QIDAQABAoIBAQCkpBw7F8jMZOHg
-34g3XW9JnumbGj9Lb+N89MEQRcNYtsbrsdwIWPn+PGuoYV70SGzemErsNCX9ICue
-HFww7yGwM4mKCtJK8fIFBObjg8cCpop1IQIXfS6apITLPMFjSKzva8wPo+sYBZP+
-RfNOPs/JB5zKGkk5PgfRI6gNbyCGfYiuazRVt3+yer2BZNZdL3dguu3dmFDFS3oB
-64TF0jk/viFjBpxioSm1UBI7BFUHNlco7PeHtIR94IsKqLHD/07ssPfkSJc5wTzE
-Qd3jiUHisbdrwrDj4RtlO2xkB/ByIQG1civRyz98IB8NJL74O/UMMddRzBBS+stl
-7Cn+r/BtAoGBAN5rDW4Gn68YOSUbc78XurYmTeHnekca5Wq+88j4kjkMy+JRzQzJ
-yiZVN9V67ReflJ16kaimeWVH1G/ry4TZL064fa02oOD2/pmW0I7hTP8PRXxLhLnD
-oWPo8bi/VT5A35lb8Vj12CrgyzaININ8peIScpLKmwTS+JgzYjQ14FdLAoGBAMDW
-CWdOozgZp7jR8C8smbE3cK1y7VOZo5e0Da49yghNobcTlVOIf0s24SuYk8uuwtXT
-7SAkTEgztJ5OyM6UNtYOxTnk2YHcfSJzaGGxDf90E/g8MKBIqZlkuSGSYj4xrAmV
-iTOCeNHCqqLTZi3I/7n9LbvelQlERGSz0a7VY9tLAoGAIoq5oTbCIe0/IrYquaiz
-xIoaWlUatmRE8NkK/1ErVFTabSGLGMtV67IcY7kdjSepavOYH3sLK2GGaoNSLiWU
-pUMdsYLkZUu2qp+zcB0pWgtDHVSVHkx1ihCpSandUTe+AhE3YDt+ANq8dJGepjT7
-hiqbRJTWkl85YFnKjJU5bBUCgYEAjiyAbGFnJ5KKvVJTsoRAoI9OjSNB5TROkCfZ
-OlEmJq8N/wv6OcdWit7gbyMkPLURw1Nn7h20/Dra/Sj7FoviTjo/oWqgDwXAYOkT
-2YsP1fsASjIea96G5KiFckIaGt7Gh55vtMGKUKUk573TBQi/uqH22R/HZDin8FM/
-0pZT9DcCgYB1uevfgndL4aKLTEezAUld6xBLfqWjqVuULRDyYF9yf+IFW3pyMT/B
-1fy8G50tJyexAgsq1TXk4jgWmRdCBbYerhWSHbxn5pEdFvmPOrVTQlsuW1gtUZVa
-jbYQflsxRhR+ikeaiW77W9m8U1/aflnbFl2aPtYc2kKAzEO0zDathA==
------END RSA PRIVATE KEY----- }}
+        key: ${{ secrets.EC2_SSH_KEY }}
         script: |
 
           aws ecr get-login-password --region eu-north-1 | \

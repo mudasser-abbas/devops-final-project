@@ -11,25 +11,28 @@ app.get('/', (req, res) => {
     visitors++;
 
     res.send(`
-    <html>
-    <head>
-      <title>DevOps Final Project</title>
-    </head>
-    <body>
-      <h1>DevOps Final Project</h1>
+   
+<html>
+<head>
+<title>DevOps Final Project</title>
+</head>
+<body>
 
-      <h2>Muhammad Mudasser Abbas</h2>
+<h1>DevOps Final Project - CI/CD Test</h1>
 
-      <p><b>Current Time:</b> ${new Date()}</p>
+<h2>Muhammad Mudasser Abbas</h2>
 
-      <p><b>Container Host:</b> ${os.hostname()}</p>
+<p><b>Version:</b> V2 deployed through GitHub Actions</p>
 
-      <p><b>Visitors:</b> ${visitors}</p>
+<p><b>Current Time:</b> ${new Date()}</p>
 
-    </body>
-    </html>
-    `);
-});
+<p><b>Container Host:</b> ${os.hostname()}</p>
+
+<p><b>Visitors:</b> ${visitors}</p>
+
+</body>
+</html>
+ );
 
 app.get('/health', (req,res)=>{
     res.send("Application Healthy");

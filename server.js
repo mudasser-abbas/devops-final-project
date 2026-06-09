@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
 
     <h2>Muhammad Mudasser Abbas</h2>
 
-    <p><b>Version:</b> V2 deployed through GitHub Actions</p>
+    <p><b>Version:</b> V3 deployed through GitHub Actions Completely</p>
 
     <p><b>Current Time:</b> ${new Date()}</p>
 

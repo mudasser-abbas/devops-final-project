@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
 
 </body>
 </html>
- );
+` );
 
 app.get('/health', (req,res)=>{
     res.send("Application Healthy");
@@ -41,3 +41,4 @@ app.get('/health', (req,res)=>{
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+

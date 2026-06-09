@@ -68,18 +68,3 @@ jobs:
           app=${{ secrets.ECR_REGISTORY }}/devops-final-project:latest
           kubectl rollout restart deployment/devops-final-project
           kubectl rollout status deployment/devops-final-project
-
-    # 8. Restart Port Forward (separate step, won't fail pipeline)
-    - name: Restart Port Forward
-      continue-on-error: true
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ubuntu
-        key: ${{ secrets.EC2_SSH_KEY }}
-        script: |
-          pkill -f "kubectl port-forward" || true
-          sleep 2
-          nohup kubectl port-forward svc/devops-final-service 30080:3000 \
-          --address 0.0.0.0 > /home/ubuntu/portforward.log 2>&1 &
-          disown

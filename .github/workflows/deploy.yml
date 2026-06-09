@@ -1,28 +1,21 @@
 name: CI-CD Pipeline
-
 on:
   push:
     branches:
       - main
-
 env:
   AWS_REGION: eu-north-1
   ECR_REPOSITORY: devops-final-project
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-
     # 1. Checkout Code
     - name: Checkout Repository
       uses: actions/checkout@v4
-
     # 2. Setup Docker Buildx
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
-
     # 3. Configure AWS Credentials
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -30,28 +23,23 @@ jobs:
         aws-access-key-id: ${{ secrets.EC2_ACCESS_KEY }}
         aws-secret-access-key: ${{ secrets.EC2_SECRET_KEY }}
         aws-region: eu-north-1
-
     # 4. Login to Amazon ECR
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
-
     # 5. Build Docker Image
     - name: Build Docker Image
       run: |
         docker build -t $ECR_REPOSITORY .
-
     # 6. Tag and Push Image to ECR
     - name: Tag Image
       run: |
         docker tag $ECR_REPOSITORY:latest \
         ${{ secrets.ECR_REGISTORY }}/$ECR_REPOSITORY:latest
-
     - name: Push Image
       run: |
         docker push \
         ${{ secrets.ECR_REGISTORY }}/$ECR_REPOSITORY:latest
-
     # 7,8,9 SSH into EC2, Pull Image and Restart Kubernetes
     - name: Deploy on EC2
       uses: appleboy/ssh-action@master
@@ -60,17 +48,27 @@ jobs:
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-
+          # Refresh ECR auth for Docker
           aws ecr get-login-password --region eu-north-1 | \
           docker login --username AWS --password-stdin \
           ${{ secrets.ECR_REGISTORY }}
 
+          # Refresh ECR secret for Kubernetes
+          kubectl delete secret ecr-secret --ignore-not-found
+          kubectl create secret docker-registry ecr-secret \
+            --docker-server=${{ secrets.ECR_REGISTORY }} \
+            --docker-username=AWS \
+            --docker-password=$(aws ecr get-login-password --region eu-north-1)
+
+          # Pull and deploy latest image
           docker pull \
           ${{ secrets.ECR_REGISTORY }}/devops-final-project:latest
-
           kubectl set image deployment/devops-final-project \
           app=${{ secrets.ECR_REGISTORY }}/devops-final-project:latest
-
           kubectl rollout restart deployment/devops-final-project
-
           kubectl rollout status deployment/devops-final-project
+
+          # Restart port-forward automatically
+          pkill -f "kubectl port-forward" || true
+          nohup kubectl port-forward svc/devops-final-service 30080:3000 \
+          --address 0.0.0.0 > /home/ubuntu/portforward.log 2>&1 &
